@@ -23,7 +23,7 @@ body {
 }
 
 .Form_box {
-    background-color: #1e1e1e;
+    background-color: #00040D;
     width: 50%; 
     padding: 50px;
     padding-left: 10%;
@@ -34,6 +34,8 @@ body {
 }
 
 .Logo {
+    display: flex;
+    flex-direction: row;
     position: absolute; 
     top: 20px;  
     left: 30px; 
@@ -41,9 +43,16 @@ body {
     font-weight: bold;
     color: aliceblue;
 }
+.Logo_img{
+    width: 40px; 
+    height: 40px;
+    object-fit: contain;
+    background: transparent;
+    padding-right: 10px;
 
+}
 .Logo_text {
-    font-size: 22px;
+    font-size: 30px;
     font-weight: bold;
     color: aliceblue; 
 }
@@ -63,15 +72,21 @@ body {
 }
 
 .Input_box {
+    background-color: whitesmoke;
     width: 100%;
     padding: 12px;
-    border: 1px solid whitesmoke;
+    border: 1px solid blue;
     border-radius: 6px;
     font-size: 16px;
+    color: aliceblue;
+}
+.Input_box::placeholder{
+    color: midnightblue;
 }
 
 
 #Rem_forgot_box {
+    color: aliceblue;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -89,6 +104,7 @@ body {
 }
 
 #Rem_forgot_box a {
+    color: aliceblue;
     text-decoration: none;
     color: #007bff; 
     font-size: 14px;
@@ -117,6 +133,7 @@ body {
 
 /* Sign-up Option */
 .sign_option {
+    color: aliceblue;
     text-align: center;
     margin-top: 15px;
     font-size: 14px;
@@ -152,7 +169,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: white;
+    background: whitesmoke;
     border: 1px solid #ccc;
     padding: 10px;
     width: 100%;
