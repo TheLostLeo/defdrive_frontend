@@ -1,0 +1,24 @@
+#Rem_forgot_box {
+    color: aliceblue;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+#Checkbox_lab {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+#Checkbox_lab input {
+    margin-right: 5px; 
+}
+
+#Rem_forgot_box a {
+    color: aliceblue;
+    text-decoration: none;
+    color: #007bff; 
+    font-size: 14px;
+}

@@ -1,4 +1,3 @@
-/* Import Google Font for a modern look */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
 * {
@@ -43,6 +42,7 @@ body {
     font-weight: bold;
     color: aliceblue;
 }
+
 .Logo_img{
     width: 40px; 
     height: 40px;
@@ -51,6 +51,7 @@ body {
     padding-right: 10px;
 
 }
+
 .Logo_text {
     font-size: 30px;
     font-weight: bold;
@@ -63,7 +64,6 @@ body {
     color: aliceblue;
     margin-bottom: 20px;
 }
-
 
 .input_box {
     display: flex;
@@ -80,36 +80,10 @@ body {
     font-size: 16px;
     color: midnightblue;
 }
+
 .Input_box::placeholder{
     color: midnightblue;
 }
-
-
-#Rem_forgot_box {
-    color: aliceblue;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-}
-
-#Checkbox_lab {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-}
-
-#Checkbox_lab input {
-    margin-right: 5px; 
-}
-
-#Rem_forgot_box a {
-    color: aliceblue;
-    text-decoration: none;
-    color: #007bff; 
-    font-size: 14px;
-}
-
 
 .button_box {
     margin-top: 20px;
@@ -131,7 +105,6 @@ body {
     background-color: #0056b3; /* Darker blue on hover */
 }
 
-/* Sign-up Option */
 .sign_option {
     color: aliceblue;
     text-align: center;
@@ -142,6 +115,12 @@ body {
 .sign_option a {
     text-decoration: none;
     color: #007bff;
+}
+
+.Image_box {
+    width: 50%; 
+    background: url('../Image/Login_sign.png') no-repeat center center;
+    background-size: cover;
 }
 
 .divider {
@@ -183,28 +162,3 @@ body {
     width: 20px;
     margin-right: 10px;
 }
-
-.Image_box {
-    width: 50%; 
-    background: url('../Image/Login_sign.png') no-repeat center center;
-    background-size: cover;
-}
-
-.hidden {
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-}
-.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.resend-link{
-    color: red;
-    padding-top: 5px;
-}
-
