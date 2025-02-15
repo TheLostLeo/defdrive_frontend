@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../assest/Stylesheets/login_signin_common.css">
+    <link rel="icon" type="image/png" href="../assest/Image/logo.png">
+
+</head>
+<body>
+    <div class="Main_body">
+        <div id="Form_box_tr"class="Form_box">
+            <div class="Logo">
+                <img class="Logo_img" src="../assest/Image/logo.png">
+                <p class="Logo_text">DefDrive</p>
+            </div>
+            <div id="Forget_box">
+                <div class="Heading_box">
+                    <p class="Heading"><b>Forgot Password</b></p>
+                </div>
+                <div  class="Form_area">
+                    <form id="Forget_form">
+                        <div class="input_box">
+                        <input type="email" placeholder="email" class="Input_box">
+                        </div>
+                        <div class="button_box">
+                            <button type="submit" id="sent_btn" class="submit_btn">Sent Email</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="code-section" class="otp-box hidden">
+                <p class="Heading"><b>Enter Verification Code</b></p>
+                    <div class="code-container">
+                        <input type="text" placeholder="Enter code" class="Input_box">
+                    </div>
+                <div class="button_box">
+                    <button type="submit" id="submit_btn" class="submit_btn">Submit</button>
+                </div>
+                <p id="resend-otp" class="resend-link">Resend OTP</p>
+
+            </div>
+        </div>
+        <div class="Image_box">
+
+        </div>
+    </div>
+    
+    <script src="../assest/Scripts/Forgot.js"></script>
+</body>
+</html>

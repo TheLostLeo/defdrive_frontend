@@ -78,7 +78,7 @@ body {
     border: 1px solid blue;
     border-radius: 6px;
     font-size: 16px;
-    color: aliceblue;
+    color: midnightblue;
 }
 .Input_box::placeholder{
     color: midnightblue;
@@ -189,3 +189,22 @@ body {
     background: url('../Image/Login_sign.png') no-repeat center center;
     background-size: cover;
 }
+
+.hidden {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.resend-link{
+    color: red;
+    padding-top: 5px;
+}
+
