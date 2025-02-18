@@ -1,0 +1,199 @@
+/* CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #00040D;
+    color: #fff;
+}
+
+/* Navigation Bar */
+.nav-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #00040D;
+    padding: 15px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+
+
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.nav-left img.Logo {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.nav-left p.text {
+    font-size: 25px;
+    margin: 0;
+    padding-left: 5px;
+}
+
+.nav-center {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+}
+
+.nav-center li a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.nav-right button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Main Wrapper */
+.main-wrapper {
+    position: relative;
+    background-color: bisque;
+    background-image: url(../Image/Login_sign.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    overflow: hidden;
+    padding-top: 80px; /* Adjusted for fixed navbar */
+    text-align: center;
+}
+
+.main-wrapper .content {
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+}
+
+.main-wrapper h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.main-wrapper p {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+.main-wrapper .cta-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+.main-wrapper svg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: -2px; /* Adjust to fully overlap */
+}
+
+/* Sections */
+section {
+    background-color: #00040D;
+    width: 100vw;
+    height: 100vh;
+    padding-top: 80px; /* Adjusted for fixed navbar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.about-wrapper {
+    background-color: #00040D;
+}
+
+.about-wrapper h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.about-wrapper p {
+    font-size: 20px;
+    max-width: 800px;
+}
+
+.contact-wrapper {
+    background-color: #00040D;
+}
+
+.contact-wrapper h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.contact-wrapper form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.contact-wrapper input,
+.contact-wrapper textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #444;
+    color: white;
+}
+
+.contact-wrapper textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.contact-wrapper button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+
