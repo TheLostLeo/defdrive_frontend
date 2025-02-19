@@ -88,6 +88,10 @@ body {
     font-size: 16px;
 }
 
+#log_btn{
+    margin-right: 5px ;
+}
+
 /* Main Wrapper */
 .main-wrapper {
     position: relative;
