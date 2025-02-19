@@ -5,7 +5,15 @@
     box-sizing: border-box;
 }
 
-/* Smooth scrolling */
+::-webkit-scrollbar {
+    display: none;
+}
+
+
+html, body {
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+}
 html {
     scroll-behavior: smooth;
 }
@@ -14,6 +22,9 @@ body {
     font-family: Arial, sans-serif;
     background-color: #00040D;
     color: #fff;
+    overflow: auto;
+    -ms-overflow-style: none;  
+    scrollbar-width: none; 
 }
 
 /* Navigation Bar */
@@ -196,4 +207,59 @@ section {
     font-size: 16px;
 }
 
+
+
+
+
+
+
+.footer {
+    background-color: #00040D; /* Matches your dark theme */
+    color: #fff;
+    padding: 20px;
+    width: 100%;
+}
+
+.footer-line {
+    border: none;
+    height: 1px;
+    background-color: #333; /* Slightly lighter than the background */
+    margin-bottom: 20px;
+    width: 90%;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+.document-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.document-link:hover {
+    text-decoration: underline;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    transition: transform 0.3s, opacity 0.3s;
+    opacity: 0.8;
+}
+
+.icon:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
 
