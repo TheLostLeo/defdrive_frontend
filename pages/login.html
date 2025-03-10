@@ -3,52 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../assest/Stylesheets/Common.css">
+    <title>Auth Page</title>
     <link rel="stylesheet" href="../assest/Stylesheets/Login.css">
     <link rel="icon" type="image/png" href="../assest/Image/logo.png">
-
 </head>
 <body>
+
     <div class="Main_body">
-        <div class="Form_box">
-            <div class="Logo">
-                <img class="Logo_img" src="../assest/Image/logo.png">
-                <p class="Logo_text">DefDrive</p>
-            </div>
-            <div class="Heading_box">
-                <p class="Heading"><b>Welcome Back</b></p>
-            </div>
-            <div class="Form_area">
-                <form id="Login_form">
-                    <div class="input_box">
-                    <input type="text" placeholder="Username" class="Input_box">
-                    <input type="password" placeholder="password" class="Input_box">
-                    </div>
-                    <div id="Rem_forgot_box">
-                        <label id="Checkbox_lab"><input type="checkbox" name="Remember_me" value="Remember_me">Remember Me </label>
-                        <a href="Forgot.html">Forgot Password</a>
-                    </div>
-                    <div class="button_box">
-                        <button class="submit_btn">Login In</button>
-                    </div>
-                    <div class="sign_option">
-                        <p>Don't have a account ? <a href="signin.html">Sign Up</a></p>
-                    </div>
-                </form>
-                <div class="divider">
-                    <span>Login with</span>
+        <!-- Sliding Container -->
+        <div class="Container">
+            
+            <!-- Login Form -->
+            <div class="Form_box login_box">
+                <div class="Logo">
+                    <img class="Logo_img" src="../assest/Image/logo.png">
+                    <p class="Logo_text">DefDrive</p>
                 </div>
-                <button class="google-login">
-                    <img src="../assest/Image/google_logo.png" alt="Google Logo">
-                    Login with Google
+                <div class="Heading_box">
+                    <p class="Heading"><b>Welcome Back</b></p>
+                </div>
+                <div class="Form_area">
+                    <form id="Login_form">
+                        <div class="input_box">
+                            <input type="text" id="loginUsername" placeholder="Username" class="Input_box" required>
+                            <input type="password" id="loginPassword" placeholder="Password" class="Input_box" required>
+                        </div>
+                        <div class="error-message" id="loginError"></div>
+                        <div id="Rem_forgot_box">
+                            <label id="Checkbox_lab"><input type="checkbox"> Remember Me</label>
+                            <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+                        </div>
+                        <div class="button_box">
+                            <button type="submit" class="submit_btn">Login</button>
+                        </div>
+                        <div class="sign_option">
+                            <p>Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+                        </div>
+                    </form>
+                    <div class="divider"><span>OR</span></div>
+                    <button class="google-login">
+                        <img src="../assest/Image/google_logo.png" alt="Google Logo">
+                        Login with Google
                     </button>
+                </div>
             </div>
-        </div>
-        <div class="Image_box">
+
+            <!-- Signup Form -->
+            <div class="Form_box signup_box">
+                <div class="Logo">
+                    <img class="Logo_img" src="../assest/Image/logo.png">
+                    <p class="Logo_text">DefDrive</p>
+                </div>
+                <div class="Heading_box">
+                    <p class="Heading"><b>Register Now</b></p>
+                </div>
+                <div class="Form_area">
+                    <form id="Signup_form">
+                        <div class="input_box">
+                            <input type="text" id="signupName" placeholder="Name" class="Input_box" required>
+                            <input type="email" id="signupEmail" placeholder="abc@example.com" class="Input_box" required>
+                            <input type="text" id="signupUsername" placeholder="Username" class="Input_box" required>
+                            <input type="password" id="signupPassword" placeholder="Password" class="Input_box" required>
+                            <input type="password" id="confirmPassword" placeholder="Confirm Password" class="Input_box" required>
+                        </div>
+                        <div class="error-message" id="signupError"></div>
+                        <div class="button_box">
+                            <button type="submit" class="submit_btn">Sign Up</button>
+                        </div>
+                        <div class="sign_option">
+                            <p>Already have an account? <a href="#" id="showLogin">Login In</a></p>
+                        </div>
+                    </form>
+                    <div class="divider"><span>OR</span></div>
+                    <button class="google-login">
+                        <img src="../assest/Image/google_logo.png" alt="Google Logo">
+                        Sign Up with Google
+                    </button>
+                </div>
+            </div>
 
         </div>
+
+        <!-- Image Section -->
+        <div class="Image_box"></div>
     </div>
-    
+
+    <!-- Forgot Password Popup -->
+    <div id="forgotPasswordPopup" class="popup-container">
+        <div class="popup-box">
+            <h2>Enter Verification Code</h2>
+            <p>We have sent a 6-digit verification code to your email.</p>
+
+            <!-- 6-digit input fields -->
+            <div class="code-input">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+            </div>
+
+            <button id="submitCode">Verify</button>
+            <p class="resend-link"><a href="#" id="resendCode">Resend Code</a></p>
+
+            <span class="close-popup">&times;</span>
+        </div>
+    </div>
+
+    <script src="../assest/Scripts/signing.js"></script>
 </body>
 </html>
+
+
