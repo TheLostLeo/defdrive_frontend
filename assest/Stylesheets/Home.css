@@ -444,5 +444,21 @@ textarea {
   vertical-align: middle; /* Align icons with text */
 }
 
+.auth-btn {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.auth-btn:hover {
+  background-color: #e68900;
+}
+
+
   
 

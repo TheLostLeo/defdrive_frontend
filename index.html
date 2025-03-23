@@ -12,29 +12,31 @@
 
   <!-- ====== NAVIGATION ====== -->
   <nav class="nav-wrapper">
-      <div class="nav-left">
-          <img class="logo" src="./assest/Image/logo.png" alt="DefDrive Logo">
-          <p class="text">DefDrive</p>
-      </div>
-      <ul class="nav-center">
-          <li><a href="#home">Home</a></li>
-          <li><a href="#site-info">About</a></li>
-          <li><a href="#team">Creators</a></li>
-          <li><a href="#contact">Contact</a></li>
-      </ul>
-      <div class="nav-right">
-          <button id="log_btn" onclick="location.href='../pages/login.html'">Login</button>
-      </div>
-  </nav>
+    <div class="nav-left">
+        <img class="logo" src="assest/Image/logo.png" alt="DefDrive Logo">
+        <p class="text">DefDrive</p>
+    </div>
+    <ul class="nav-center">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#site-info">About</a></li>
+        <li><a href="#team">Creators</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button id="authButton" class="auth-btn"></button>
+  </div>
+  
+  
+</nav>
 
   <!-- ====== HERO SECTION ====== -->
   <section id="home" class="main-wrapper page-common">
-      <div class="content">
-          <h1>Want to share files?</h1>
-          <p>Start now.</p>
-          <button class="cta-button">Start Sharing Now</button>
-      </div>
-  </section>
+    <div class="content">
+        <h1>Want to share files?</h1>
+        <p>Start now.</p>
+        <button id="ctaButton" class="cta-button">Start Sharing Now</button>
+    </div>
+</section>
 
   <!-- ====== APP INFO SECTION ====== -->
   <section id="site-info" class="app-info page-common">
@@ -174,7 +176,8 @@
         </div>
     </div>
 </section>
-
+<script src="./assest/Scripts/home.js"></script>
 
 </body>
 </html>
+

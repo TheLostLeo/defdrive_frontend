@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DefDrive</title>
+    <link rel="stylesheet" href="/assest/Stylesheets/file-sharing.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <h1>DefDrive</h1>
+        </div>
+        <div class="nav-right">
+            <button class="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Sidebar with File Info -->
+    <div class="sidebar">
+        <button class="add-file-btn">+ Add File</button>
+        <div class="file-info">
+            <h3>Total Files</h3>
+            <p>2750 Files</p>
+            <p>75.5GB / <b>100GB</b></p>
+        </div>
+        
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search indexed files...">
+    </div>
+
+    <!-- File Table -->
+    <div class="file-table">
+        <h1>My Files</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>File Name</th>
+              <th>Size</th>
+              <th>Links</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Example Row #1 -->
+            <tr>
+              <td>Project_Report.pdf</td>
+              <td>2.1MB</td>
+              <td>
+                <button class="links-btn" onclick="toggleDropdown('file1-dropdown')">Links</button>
+                <!-- Dropdown Container -->
+                <div class="dropdown-content" id="file1-dropdown">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Link</th>
+                        <th>Access</th>
+                        <th>TTL</th>
+                      </tr>
+                    </thead>
+                    <tbody id="file1-links-list">
+                      <!-- Existing links for demonstration -->
+                      <tr>
+                        <td>https://defdrive.com/share/abc123</td>
+                        <td>Public</td>
+                        <td>1d 4h</td>
+                      </tr>
+                      <tr>
+                        <td>https://defdrive.com/share/xyz789</td>
+                        <td>Private</td>
+                        <td>12h</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <!-- Button to create new link -->
+                  <button class="create-link-btn" onclick="openCreateLinkModal('file1-links-list')">Create Link</button>
+                </div>
+              </td>
+            </tr>
+      
+            <!-- Example Row #2 -->
+            <tr>
+              <td>Design_Mockup.png</td>
+              <td>3.8MB</td>
+              <td>
+                <button class="links-btn" onclick="toggleDropdown('file2-dropdown')">Links</button>
+                <div class="dropdown-content" id="file2-dropdown">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Link</th>
+                        <th>Access</th>
+                        <th>TTL</th>
+                      </tr>
+                    </thead>
+                    <tbody id="file2-links-list">
+                      <tr>
+                        <td>https://defdrive.com/share/hello456</td>
+                        <td>Public</td>
+                        <td>2d</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <button class="create-link-btn" onclick="openCreateLinkModal('file2-links-list')">Create Link</button>
+                </div>
+              </td>
+            </tr>
+      
+          </tbody>
+        </table>
+      
+        <!-- Modal for Creating a New Link -->
+        <div class="modal" id="createLinkModal">
+          <div class="modal-content">
+            <span class="close-btn" onclick="closeCreateLinkModal()">&times;</span>
+            <h2>Create a New Link</h2>
+      
+            <div class="form-row">
+              <label for="accessSelect">Access:</label>
+              <select id="accessSelect">
+                <option value="Public">Public</option>
+                <option value="Private">Private</option>
+              </select>
+            </div>
+      
+            <div class="form-row">
+              <label for="ttlSelect">Time to Live:</label>
+              <select id="ttlSelect">
+                <option value="1h">1 Hour</option>
+                <option value="12h">12 Hours</option>
+                <option value="1d">1 Day</option>
+                <option value="2d">2 Days</option>
+                <option value="7d">7 Days</option>
+              </select>
+            </div>
+      
+            <button class="ok-btn" onclick="generateLink()">OK</button>
+      
+            <!-- Generated Link Display -->
+            <div id="generatedLink" class="generated-link">
+              <p>New Link: <span id="linkUrl"></span></p>
+              <button class="copy-btn" onclick="copyLink()">Copy</button>
+            </div>
+          </div>
+        </div>
+      
+        <script src="/assest/Scripts/file-sharing.js"></script>
+    </div>
+
+</body>
+</html>
+
+
+
