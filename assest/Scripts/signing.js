@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Save token and username in sessionStorage
           sessionStorage.setItem("token", result.token);
           sessionStorage.setItem("username", result.user.username);
+          sessionStorage.setItem("loggedin", "yes");
           // Redirect to index page
           window.location.href = "../index.html";
         } else {

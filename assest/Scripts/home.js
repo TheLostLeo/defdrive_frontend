@@ -1,7 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const authButton = document.getElementById('authButton');
     const startSharingBtn = document.querySelector('.cta-button'); // The "Start Sharing Now" button
-    const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+    let isLoggedIn = false;
+    if (sessionStorage.getItem("username")) {
+       isLoggedIn = true;
+   } 
+   else {
+      isLoggedIn = false;
+       }
 
     // Update the nav button (Login or Share Files)
     if (authButton) {
