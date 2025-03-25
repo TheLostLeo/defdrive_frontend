@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
           sessionStorage.setItem("token", result.token);
           sessionStorage.setItem("username", result.user.username);
           // Redirect to index page
-          window.location.href = "index.html";
+          window.location.href = "../index.html";
         } else {
           // For errors, display the error message returned by the server
           showErrorMessage(loginForm, result.error || result.message);
