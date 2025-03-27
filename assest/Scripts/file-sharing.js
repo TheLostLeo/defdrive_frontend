@@ -1,389 +1,787 @@
-// file-sharing.js
+// Define the API base URL
+const API_BASE_URL = "https://defdb.wlan0.in/api/";
 
-// Base API URL (adjust if necessary)
-const baseURL = "https://defdrive.wlan0.in";
-
-// Helper to get authorization headers (assumes token stored in sessionStorage)
-function getAuthHeaders() {
-  const token = sessionStorage.getItem("token");
-  return token ? { "Authorization": `Bearer ${token}` } : {};
+// Toggle the row containing links
+function toggleLinks(button, fileID) {
+  const row = button.closest("tr").nextElementSibling;
+  if (row.classList.contains("hidden")) {
+    row.classList.remove("hidden");
+    button.textContent = "Hide Links";
+    fetchAccesses(fileID); // Fetch accesses when the subtable is shown
+    logFileAction("Show Links", fileID);
+  } else {
+    row.classList.add("hidden");
+    button.textContent = "Show Links";
+    logFileAction("Hide Links", fileID);
+  }
 }
 
-/* ---------------------------
-   API ENDPOINT FUNCTIONS
---------------------------- */
+// Copy the link to clipboard
+function copyToClipboard(button) {
+  const linkInput = button.closest("tr").querySelector(".link-input");
+  linkInput.select();
+  navigator.clipboard.writeText(linkInput.value);
+  button.textContent = "Copied!";
+  setTimeout(() => (button.textContent = "Copy"), 1500);
+}
 
-/**
- * Upload File
- * POST /api/upload
- * FormData with "file" field, and query parameter ?public=<boolean>
- */
-async function uploadFile(file, isPublic = false) {
+// Open upload modal
+function openUploadModal() {
+  const uploadModal = document.getElementById("uploadModal");
+  if (uploadModal) {
+    uploadModal.style.display = "flex";
+  } else {
+    console.error("Upload modal not found.");
+  }
+}
+
+// Close upload modal
+function closeUploadModal() {
+  const uploadModal = document.getElementById("uploadModal");
+  if (uploadModal) {
+    uploadModal.style.display = "none";
+  } else {
+    console.error("Upload modal not found.");
+  }
+}
+
+// Handle file selection and display file name
+document.addEventListener("DOMContentLoaded", function () {
+  const fileInput = document.getElementById("fileInput");
+  if (fileInput) {
+    fileInput.addEventListener("change", function () {
+      const fileName = this.files[0] ? this.files[0].name : "No file chosen";
+      const fileNameDisplay = document.getElementById("fileName");
+      if (fileNameDisplay) {
+        fileNameDisplay.textContent = fileName;
+      }
+    });
+  } else {
+    console.error("File input element not found.");
+  }
+});
+
+// Open and close modals for creating access
+function openCreateAccessModal(fileID) {
+  const modal = document.getElementById("createAccessModal");
+  modal.setAttribute("data-file-id", fileID);
+  modal.removeAttribute("data-access-id"); // Ensure no access ID is set for creation
+
+  // Show input for Create
+  document.getElementById("accessNameInput").classList.remove("hidden");
+  document.getElementById("accessNameInput").value = ""; // Clear input field
+
+  document.getElementById("createAccessBtn").classList.remove("hidden");
+  document.getElementById("updateAccessBtn").classList.add("hidden");
+  document.getElementById("accessModalHeader").textContent = "Create Access"; // Update header
+  modal.style.display = "flex";
+}
+
+// Close the Create Access modal
+function closeCreateAccessModal() {
+  document.getElementById("createAccessModal").style.display = "none";
+}
+
+// Add dynamic input fields
+function addInput(containerId) {
+  const container = document.getElementById(containerId);
+  const div = document.createElement("div");
+  div.classList.add("dynamic-input");
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.classList.add("input-field");
+  input.placeholder =
+    containerId === "subnetContainer"
+      ? "Enter subnet (e.g. 192.168.1.0/24)"
+      : "Enter IP (e.g. 192.168.1.1)";
+
+  const removeBtn = document.createElement("button");
+  removeBtn.innerHTML = "✖";
+  removeBtn.classList.add("remove-btn");
+  removeBtn.onclick = function () {
+    container.removeChild(div);
+  };
+
+  div.appendChild(input);
+  div.appendChild(removeBtn);
+  container.appendChild(div);
+}
+
+// Helper function to get the token from sessionStorage
+function getAuthToken() {
+  const token = sessionStorage.getItem("token");
+  if (!token) {
+    console.error("Authorization token is missing. Please log in.");
+  }
+  return token;
+}
+
+// Ensure the token is set in sessionStorage before making API requests
+document.addEventListener("DOMContentLoaded", function () {
+  const authToken = sessionStorage.getItem("token");
+  if (!authToken) {
+    alert("You are not logged in. Please log in to continue.");
+    // Redirect to login page or handle unauthorized access
+    window.location.href = "/login.html"; // Adjust the path to your login page
+  }
+});
+
+// =============================
+// File Endpoints
+// =============================
+
+// Fetch all files
+async function fetchFiles() {
   try {
-    const url = `${baseURL}/api/upload?public=${isPublic}`;
+    const response = await fetch(`${API_BASE_URL}files`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
+    const { files } = await response.json();
+    console.log("Fetched Files:", files);
+
+    const fileTableBody = document.querySelector(".file-table tbody");
+    fileTableBody.innerHTML = ""; // Clear existing rows
+
+    files.forEach((file) => {
+      const fileRow = document.createElement("tr");
+      fileRow.setAttribute("data-file-id", file.ID); // Add file ID as a data attribute
+      fileRow.innerHTML = `
+        <td>${file.Name}</td>
+        <td>${(file.Size / 1024).toFixed(2)} KB</td>
+        <td>
+          <div class="action-buttons">
+            <button class="links-toggle-btn" onclick="toggleLinks(this, ${file.ID})">Show Links</button>
+            <button class="delete-btn" onclick="deleteFile(${file.ID})">Delete</button>
+          </div>
+        </td>
+        <td class="access-toggle">
+          <label class="switch">
+            <input type="checkbox" ${file.Public ? "checked" : ""} onchange="toggleFilePublic(${file.ID}, this.checked)">
+            <span class="slider"></span>
+          </label>
+        </td>
+      `;
+      fileTableBody.appendChild(fileRow);
+
+      // Add a hidden row for the subtable (accesses)
+      const accessRow = document.createElement("tr");
+      accessRow.classList.add("link-row", "hidden");
+      accessRow.setAttribute("data-file-id", file.ID); // Add file ID as a data attribute
+      accessRow.innerHTML = `
+        <td colspan="4">
+          <div class="link-table-header">
+            <button class="create-link-btn" onclick="openCreateAccessModal(${file.ID})">+ Create New Link</button>
+          </div>
+          <table class="links-table">
+            <thead>
+              <tr>
+                <th>Link</th>
+                <th>Copy</th>
+                <th>Actions</th>
+                <th>Toggle Access</th>
+              </tr>
+            </thead>
+            <tbody id="accessTable-${file.ID}">
+              <!-- Access rows will be dynamically populated -->
+            </tbody>
+          </table>
+        </td>
+      `;
+      fileTableBody.appendChild(accessRow);
+    });
+  } catch (error) {
+    console.error("Failed to fetch files:", error);
+  }
+}
+
+// Upload a file
+async function uploadFile(file) {
+  try {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(url, {
+    const token = getAuthToken();
+    if (!token) {
+      alert("Authorization token is missing. Please log in.");
+      return;
+    }
+
+    const response = await fetch(`${API_BASE_URL}upload`, {
       method: "POST",
       headers: {
-        ...getAuthHeaders(),
+        Authorization: `Bearer ${token}`, // Ensure token is included
       },
-      body: formData
+      body: formData,
     });
 
-    const result = await response.json();
     if (!response.ok) {
-      throw new Error(result.error || "Failed to upload file");
+      const error = await response.json();
+      throw new Error(`Error: ${response.status} - ${error.error || "Unknown error"}`);
     }
-    return result.file; // Returns uploaded file object
+
+    const result = await response.json();
+    console.log("File uploaded successfully:", result);
+    alert("File uploaded successfully!");
+    // Reset the file input and update the UI after successful upload
+    fileInput.value = "";
+    const fileNameDisplay = document.getElementById("fileName");
+    if (fileNameDisplay) {
+      fileNameDisplay.textContent = "No file chosen";
+    }
+    closeUploadModal();
+    fetchFiles(); // Refresh the file list
   } catch (error) {
-    console.error("Upload Error:", error.message);
-    throw error;
+    console.error("Failed to upload file:", error);
+    alert(`Failed to upload file: ${error.message}`);
   }
 }
 
-/**
- * Get Files
- * GET /api/files
- */
-async function getFiles() {
-  try {
-    const url = `${baseURL}/api/files`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders()
-      }
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to retrieve files");
-    }
-    return result.files; // Returns array of file objects
-  } catch (error) {
-    console.error("Get Files Error:", error.message);
-    throw error;
-  }
-}
-
-/**
- * Update File Access
- * PUT /api/files/:fileID/access
- * Request body: { "public": true/false }
- */
-async function updateFileAccess(fileID, isPublic) {
-  try {
-    const url = `${baseURL}/api/files/${fileID}/access`;
-    const response = await fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders()
-      },
-      body: JSON.stringify({ public: isPublic })
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to update file access");
-    }
-    return result.file;
-  } catch (error) {
-    console.error("Update File Access Error:", error.message);
-    throw error;
-  }
-}
-
-/**
- * Delete File
- * DELETE /api/files/:fileID
- */
+// Delete a file
 async function deleteFile(fileID) {
   try {
-    const url = `${baseURL}/api/files/${fileID}`;
-    const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}files/${fileID}`, {
       method: "DELETE",
       headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders()
-      }
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to delete file");
-    }
-    return result.message;
-  } catch (error) {
-    console.error("Delete File Error:", error.message);
-    throw error;
-  }
-}
-
-/**
- * Create Access for a File
- * POST /api/files/:fileID/accesses
- * Request body: { name, subnets, ips, expires, public, oneTimeUse, ttl, enableTTL }
- */
-async function createAccess(fileID, accessData) {
-  try {
-    const url = `${baseURL}/api/files/${fileID}/accesses`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders()
+        Authorization: `Bearer ${getAuthToken()}`,
       },
-      body: JSON.stringify(accessData)
     });
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
     const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to create access record");
-    }
-    return result.access;
+    console.log("File deleted successfully:", result);
+    alert("File deleted successfully!");
+    logFileAction("Delete File", fileID);
+    fetchFiles(); // Refresh the file list
   } catch (error) {
-    console.error("Create Access Error:", error.message);
-    throw error;
+    console.error("Failed to delete file:", error);
+    alert("Failed to delete file. Please try again.");
   }
 }
 
-/**
- * Get Accesses for a File
- * GET /api/files/:fileID/accesses
- */
-async function getAccesses(fileID) {
+// Toggle file public access
+async function toggleFilePublic(fileID, isPublic) {
   try {
-    const url = `${baseURL}/api/files/${fileID}/accesses`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders()
-      }
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to retrieve accesses");
-    }
-    return result.accesses;
-  } catch (error) {
-    console.error("Get Accesses Error:", error.message);
-    throw error;
-  }
-}
-
-/**
- * Update an Access Record
- * PUT /api/accesses/:accessID/access
- */
-async function updateAccess(accessID, accessData) {
-  try {
-    const url = `${baseURL}/api/accesses/${accessID}/access`;
-    const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}files/${fileID}/access`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        ...getAuthHeaders()
+        Authorization: `Bearer ${getAuthToken()}`,
       },
-      body: JSON.stringify(accessData)
+      body: JSON.stringify({ public: isPublic }),
     });
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
     const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to update access record");
-    }
-    return result.access;
+    console.log("File access updated successfully:", result);
+    alert("File access updated successfully!");
   } catch (error) {
-    console.error("Update Access Error:", error.message);
-    throw error;
+    console.error("Failed to update file access:", error);
+    alert("Failed to update file access. Please try again.");
   }
 }
 
-/**
- * Delete an Access Record
- * DELETE /api/accesses/:accessID
- */
-async function deleteAccess(accessID) {
+// =============================
+// Access Endpoints
+// =============================
+
+// Fetch accesses for a specific file
+async function fetchAccesses(fileID) {
   try {
-    const url = `${baseURL}/api/accesses/${accessID}`;
-    const response = await fetch(url, {
-      method: "DELETE",
+    const response = await fetch(`${API_BASE_URL}files/${fileID}/accesses`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
-        ...getAuthHeaders()
-      }
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
     });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to delete access record");
-    }
-    return result.message;
+
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
+    const { accesses } = await response.json(); // Parse JSON response
+    console.log(`Fetched Accesses for File ${fileID}:`, accesses);
+
+    // Ensure the access table is updated
+    populateAccessTable(fileID, accesses);
   } catch (error) {
-    console.error("Delete Access Error:", error.message);
-    throw error;
+    console.error(`Failed to fetch accesses for file ${fileID}:`, error);
   }
 }
 
-/* ---------------------------
-   PAGE INITIALIZATION & UI
---------------------------- */
-
-/**
- * Format file size for display (e.g., 12345 bytes -> '12.0 KB' or '1.2 MB')
- */
-function formatFileSize(sizeInBytes) {
-  if (!sizeInBytes) return "0 B";
-  const kb = sizeInBytes / 1024;
-  if (kb < 1024) {
-    return `${kb.toFixed(1)} KB`;
-  }
-  const mb = kb / 1024;
-  return `${mb.toFixed(1)} MB`;
-}
-
-/**
- * Update the file info in the sidebar: total count and total size.
- */
-function updateFileInfo(files) {
-  const totalCount = files.length;
-  const totalSize = files.reduce((acc, f) => acc + (f.Size || 0), 0);
-  const fileCountElem = document.getElementById("totalFiles");
-  const totalSizeElem = document.getElementById("totalSize");
-  if (fileCountElem) {
-    fileCountElem.textContent = `${totalCount} Files`;
-  }
-  if (totalSizeElem) {
-    totalSizeElem.innerHTML = `${(totalSize / (1024 * 1024)).toFixed(1)}MB / <b>100GB</b>`;
-  }
-}
-
-/**
- * Load files from the server and display them in the table.
- * This function is called on page load and every 1 minute.
- */
-async function loadFiles() {
+// Create a new access
+async function createAccess(fileID, accessData) {
   try {
-    const files = await getFiles();
-    const filesTbody = document.getElementById("filesTbody");
-    filesTbody.innerHTML = ""; // Clear previous rows
-
-    files.forEach((file) => {
-      // Create a row for each file
-      const row = document.createElement("tr");
-
-      // Cell 1: File Name
-      const nameCell = document.createElement("td");
-      nameCell.textContent = file.Name || "Untitled";
-      row.appendChild(nameCell);
-
-      // Cell 2: Size
-      const sizeCell = document.createElement("td");
-      sizeCell.textContent = formatFileSize(file.Size);
-      row.appendChild(sizeCell);
-
-      // Cell 3: Links Button
-      const linksCell = document.createElement("td");
-      const linksBtn = document.createElement("button");
-      linksBtn.className = "links-toggle-btn";
-      linksBtn.textContent = "Links";
-      // Add click event if you want to toggle a links row or modal here
-      linksBtn.addEventListener("click", () => {
-        // Your logic for showing file-specific link information
-        // For example, open a modal to manage access links
-        // or toggle a hidden row below this file
-        alert("Implement link management for file " + file.ID);
-      });
-      linksCell.appendChild(linksBtn);
-      row.appendChild(linksCell);
-
-      filesTbody.appendChild(row);
+    const response = await fetch(`${API_BASE_URL}files/${fileID}/accesses`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+      body: JSON.stringify(accessData),
     });
-
-    updateFileInfo(files);
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
+    const result = await response.json();
+    console.log("Access created successfully:", result);
+    alert("Access created successfully!");
+    fetchAccesses(fileID); // Refresh the access list
   } catch (error) {
-    console.error("Error loading files:", error);
+    console.error("Failed to create access:", error);
+    alert("Failed to create access. Please try again.");
   }
 }
 
-/* ---------------------------
-   PAGE LOAD & REFRESH LOGIC
---------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  // Load files immediately on page load
-  loadFiles();
-  // Refresh file list every 1 minute (60000 ms)
-  setInterval(loadFiles, 60000);
+// Update an access
+async function updateAccess(accessID, accessData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}/access`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+      body: JSON.stringify(accessData),
+    });
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
+    const result = await response.json();
+    console.log("Access updated successfully:", result);
+    alert("Access updated successfully!");
+  } catch (error) {
+    console.error("Failed to update access:", error);
+    alert("Failed to update access. Please try again.");
+  }
+}
+
+// Delete an access
+async function deleteAccess(accessID) {
+  try {
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
+    const result = await response.json();
+    console.log("Access deleted successfully:", result);
+    alert("Access deleted successfully!");
+  } catch (error) {
+    console.error("Failed to delete access:", error);
+    alert("Failed to delete access. Please try again.");
+  }
+}
+
+// =============================
+// Utility Functions
+// =============================
+
+// Populate the file table
+function populateFileTable(files) {
+  const fileTableBody = document.querySelector(".file-table tbody");
+  fileTableBody.innerHTML = ""; // Clear existing rows
+
+  files.forEach((file) => {
+    const fileRow = document.createElement("tr");
+    fileRow.setAttribute("data-file-id", file.ID); // Add file ID as a data attribute
+    fileRow.innerHTML = `
+      <td>${file.Name}</td>
+      <td>${(file.Size / 1024).toFixed(2)} KB</td>
+      <td>
+        <div class="action-buttons">
+          <button class="links-toggle-btn" onclick="toggleLinks(this, ${file.ID})">Show Links</button>
+          <button class="delete-btn" onclick="deleteFile(${file.ID})">Delete</button>
+        </div>
+      </td>
+      <td class="access-toggle">
+        <label class="switch">
+          <input type="checkbox" ${file.Public ? "checked" : ""} onchange="toggleFilePublic(${file.ID}, this.checked)">
+          <span class="slider"></span>
+        </label>
+      </td>
+    `;
+    fileTableBody.appendChild(fileRow);
+
+    // Add a hidden row for the subtable (accesses)
+    const accessRow = document.createElement("tr");
+    accessRow.classList.add("link-row", "hidden");
+    accessRow.setAttribute("data-file-id", file.ID); // Add file ID as a data attribute
+    accessRow.innerHTML = `
+      <td colspan="4">
+        <div class="link-table-header">
+          <button class="create-link-btn" onclick="openCreateAccessModal(${file.ID})">+ Create New Link</button>
+        </div>
+        <table class="links-table">
+          <thead>
+            <tr>
+              <th>Link</th>
+              <th>Copy</th>
+              <th>Actions</th>
+              <th>Toggle Access</th>
+            </tr>
+          </thead>
+          <tbody id="accessTable-${file.ID}">
+            <!-- Access rows will be dynamically populated -->
+          </tbody>
+        </table>
+      </td>
+    `;
+    fileTableBody.appendChild(accessRow);
+  });
+}
+
+// Populate the access table for a specific file
+function populateAccessTable(fileID, accesses) {
+  const accessTableBody = document.getElementById(`accessTable-${fileID}`);
+  if (!accessTableBody) {
+    console.error(`Access table body not found for file ID: ${fileID}`);
+    return;
+  }
+
+  accessTableBody.innerHTML = ""; // Clear existing rows
+
+  accesses.forEach((access) => {
+    const fullLink = `https://defdb.wlan0.in/link/${access.Link}`;
+    const accessRow = document.createElement("tr");
+    accessRow.innerHTML = `
+      <td>
+        <input type="text" class="link-input" value="${fullLink}" readonly onclick="openLink(this)">
+      </td>
+      <td>
+        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+      </td>
+      <td>
+        <button class="update-access-btn" onclick="openUpdateAccessModal(${access.ID})">Update Access</button>
+        <button class="delete-btn" onclick="deleteAccess(${access.ID})">Delete</button>
+      </td>
+      <td>
+        <label class="switch">
+          <input type="checkbox" ${access.Public ? "checked" : ""} onchange="toggleAccessPublic(${access.ID}, this.checked)">
+          <span class="slider"></span>
+        </label>
+      </td>
+    `;
+    accessTableBody.appendChild(accessRow);
+  });
+}
+
+// Handle create access
+function handleCreateAccess() {
+  const fileID = document.querySelector("#createAccessModal").getAttribute("data-file-id");
+  const name = document.getElementById("accessName").value;
+  const subnets = Array.from(document.querySelectorAll("#subnetContainer .input-field")).map(input => input.value);
+  const ips = Array.from(document.querySelectorAll("#ipContainer .input-field")).map(input => input.value);
+  const expires = document.getElementById("accessExpires").value;
+  const isPublic = document.getElementById("accessPublic").checked;
+  const oneTimeUse = document.getElementById("accessOneTimeUse").checked;
+  const ttl = document.getElementById("accessTTL").value;
+  const enableTTL = document.getElementById("accessEnableTTL").checked;
+
+  const accessData = {
+    name,
+    subnets,
+    ips,
+    expires: expires ? new Date(Date.now() + expires * 24 * 60 * 60 * 1000).toISOString() : null,
+    public: isPublic,
+    oneTimeUse,
+    ttl: ttl ? parseInt(ttl, 10) : null,
+    enableTTL,
+  };
+
+  createAccess(fileID, accessData);
+  closeCreateAccessModal();
+}
+
+// Object to store access details by accessID
+const accessDetails = {};
+
+// Open the Create Access modal for updating an access
+async function openUpdateAccessModal(accessID) {
+  const modal = document.getElementById("createAccessModal");
+  try {
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Error: ${response.status} - ${error.message || "Failed to fetch access details"}`);
+    }
+
+    const access = await response.json();
+
+    // Populate other fields
+    const subnets = Array.isArray(access.Subnets) ? access.Subnets : [];
+    document.getElementById("subnetContainer").innerHTML = subnets
+      .map(
+        (subnet) => `
+        <div class="dynamic-input">
+          <input type="text" class="input-field" value="${subnet}">
+          <button class="remove-btn" onclick="this.parentElement.remove()">✖</button>
+        </div>
+      `
+      )
+      .join("");
+
+    const ips = Array.isArray(access.IPs) ? access.IPs : [];
+    document.getElementById("ipContainer").innerHTML = ips
+      .map(
+        (ip) => `
+        <div class="dynamic-input">
+          <input type="text" class="input-field" value="${ip}">
+          <button class="remove-btn" onclick="this.parentElement.remove()">✖</button>
+        </div>
+      `
+      )
+      .join("");
+
+    document.getElementById("accessExpires").value = access.Expires
+      ? Math.ceil((new Date(access.Expires) - Date.now()) / (24 * 60 * 60 * 1000))
+      : "";
+    document.getElementById("accessPublic").checked = !!access.Public;
+    document.getElementById("accessOneTimeUse").checked = !!access.OneTimeUse;
+    document.getElementById("accessTTL").value = access.TTL || "";
+    document.getElementById("accessEnableTTL").checked = !!access.EnableTTL;
+
+    // Set modal attributes and display it
+    modal.setAttribute("data-access-id", accessID);
+    document.getElementById("createAccessBtn").classList.add("hidden");
+    document.getElementById("updateAccessBtn").classList.remove("hidden");
+    document.getElementById("accessModalHeader").textContent = "Update Access";
+    modal.style.display = "flex";
+  } catch (error) {
+    console.error("Failed to fetch access details:", error);
+    alert(`Failed to fetch access details: ${error.message}`);
+  }
+}
+
+// Handle updating an access
+async function handleUpdateAccess() {
+  const accessID = document.querySelector("#createAccessModal").getAttribute("data-access-id");
+  const name = document.getElementById("accessName").value;
+  const subnets = Array.from(document.querySelectorAll("#subnetContainer .input-field")).map(input => input.value);
+  const ips = Array.from(document.querySelectorAll("#ipContainer .input-field")).map(input => input.value);
+  const expires = document.getElementById("accessExpires").value;
+  const isPublic = document.getElementById("accessPublic").checked;
+  const oneTimeUse = document.getElementById("accessOneTimeUse").checked;
+  const ttl = document.getElementById("accessTTL").value;
+  const enableTTL = document.getElementById("accessEnableTTL").checked;
+
+  const accessData = {
+    name,
+    subnets,
+    ips,
+    expires: expires ? new Date(Date.now() + expires * 24 * 60 * 60 * 1000).toISOString() : null,
+    public: isPublic,
+    oneTimeUse,
+    ttl: ttl ? parseInt(ttl, 10) : null,
+    enableTTL,
+  };
+
+  try {
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}/access`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+      body: JSON.stringify(accessData),
+    });
+
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
+    const result = await response.json();
+    console.log("Access updated successfully:", result);
+    alert("Access updated successfully!");
+    closeCreateAccessModal();
+    fetchAccesses(result.FileID); // Refresh the access list for the file
+  } catch (error) {
+    console.error("Failed to update access:", error);
+    alert("Failed to update access. Please try again.");
+  }
+}
+
+// =============================
+// Initialize Event Listeners
+// =============================
+document.addEventListener("DOMContentLoaded", function () {
+  fetchFiles(); // Fetch files on page load
+  setInterval(fetchFiles, 180000); // Refresh files every 3 minutes
 });
 
-/* ---------------------------
-   DUMMY/UTILITY UI FUNCTIONS
---------------------------- */
-// Below are the functions from your "share" functionality example.
-// They are currently dummy implementations and can be replaced with real API calls as needed.
-
-/* Toggle a dropdown for links (if using dropdown UI) */
-function toggleDropdown(dropdownId) {
-  const dropdown = document.getElementById(dropdownId);
-  dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
-}
-
-/* Modal Controls for creating access links */
-const createLinkModal = document.getElementById("createLinkModal");
-let currentLinksTableBody = null;
-
-function openCreateLinkModal(linksTableBodyId) {
-  currentLinksTableBody = document.getElementById(linksTableBodyId);
-  if (createLinkModal) {
-    createLinkModal.style.display = "block";
+// Example: Upload a file to the API
+async function uploadFile() {
+  const fileInput = document.getElementById("fileInput");
+  if (!fileInput) {
+    console.error("File input element not found.");
+    return;
   }
-}
 
-function closeCreateLinkModal() {
-  if (createLinkModal) {
-    createLinkModal.style.display = "none";
-    document.getElementById("generatedLink").style.display = "none";
-    document.getElementById("linkUrl").textContent = "";
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("Please select a file to upload.");
+    return;
   }
-}
 
-/* Generate a new access link (dummy implementation) */
-function generateLink() {
-  const access = document.getElementById("accessSelect").value;
-  const ttl = document.getElementById("ttlSelect").value;
-  const randomPart = Math.random().toString(36).substring(2, 8);
-  const newLink = `https://defdrive.com/share/${randomPart}`;
-  document.getElementById("generatedLink").style.display = "block";
-  document.getElementById("linkUrl").textContent = newLink;
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const newRow = document.createElement("tr");
-  newRow.innerHTML = `
-    <td>${newLink}</td>
-    <td>${access}</td>
-    <td>${ttl}</td>
-  `;
-  if (currentLinksTableBody) {
-    currentLinksTableBody.appendChild(newRow);
-  }
-}
+    const token = getAuthToken();
+    if (!token) {
+      alert("Authorization token is missing. Please log in.");
+      return;
+    }
 
-/* Copy link to clipboard */
-function copyLink() {
-  const linkText = document.getElementById("linkUrl").textContent;
-  navigator.clipboard.writeText(linkText)
-    .then(() => {
-      alert("Link copied to clipboard!");
-    })
-    .catch(err => {
-      alert("Failed to copy link: " + err);
+    const response = await fetch(`${API_BASE_URL}upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`, // Ensure token is included
+      },
+      body: formData,
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Error: ${response.status} - ${error.error || "Unknown error"}`);
+    }
+
+    const result = await response.json();
+    console.log("File uploaded successfully:", result);
+    alert("File uploaded successfully!");
+    // Reset the file input and update the UI after successful upload
+    fileInput.value = "";
+    const fileNameDisplay = document.getElementById("fileName");
+    if (fileNameDisplay) {
+      fileNameDisplay.textContent = "No file chosen";
+    }
+    closeUploadModal();
+    fetchFiles(); // Refresh the file list
+  } catch (error) {
+    console.error("Failed to upload file:", error);
+    alert(`Failed to upload file: ${error.message}`);
+  }
 }
 
-/* Close modal if clicking outside of it */
-window.onclick = function(event) {
-  if (event.target === createLinkModal) {
-    closeCreateLinkModal();
-  }
-};
+// Initialize event listeners
+document.addEventListener("DOMContentLoaded", function () {
+  // Ensure modals are hidden on load
+  document.getElementById("uploadModal").style.display = "none";
+  document.getElementById("createAccessModal").style.display = "none";
 
-  
+  document.getElementById("addSubnetBtn").addEventListener("click", function () {
+    addInput("subnetContainer");
+  });
+
+  document.getElementById("addIpBtn").addEventListener("click", function () {
+    addInput("ipContainer");
+  });
+
+  // Close button for upload modal
+  document.querySelector("#uploadModal .close-btn").addEventListener("click", closeUploadModal);
+
+  // Close button for create access modal
+  document.querySelector("#createAccessModal .close-btn").addEventListener("click", closeCreateAccessModal);
+
+  // Fetch files on page load
+  fetchFiles();
+
+  // Fetch files every 3 minutes (180,000 milliseconds)
+  setInterval(fetchFiles, 180000);
+
+  const uploadForm = document.getElementById("uploadForm");
+  if (uploadForm) {
+    uploadForm.addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent the default form submission
+      uploadFile();
+    });
+  } else {
+    console.error("Upload form not found.");
+  }
+});
+
+// Update the submit button in the modal to handle updates
+document.addEventListener("DOMContentLoaded", function () {
+  const submitButton = document.querySelector("#createAccessModal .submit-btn");
+  submitButton.onclick = function () {
+    const accessID = document.querySelector("#createAccessModal").getAttribute("data-access-id");
+    if (accessID) {
+      handleUpdateAccess(); // Update access if accessID exists
+    } else {
+      handleCreateAccess(); // Create new access otherwise
+    }
+  };
+});
+
+/**
+ * Converts a JSON string into a JavaScript object.
+ * @param {string} jsonString - The JSON string to convert.
+ * @returns {object} - The resulting JavaScript object.
+ * @throws {Error} - Throws an error if the JSON is invalid.
+ */
+function parseJSONToObject(jsonString) {
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Failed to parse JSON:", error);
+    throw new Error("Invalid JSON format.");
+  }
+}
+
+// Log file actions
+function logFileAction(action, fileID) {
+  console.log(`Action: ${action}, File ID: ${fileID}`);
+}
+
+// Refresh the links table for all files every minute
+function refreshLinksTable() {
+  const fileRows = document.querySelectorAll(".file-table tbody tr[data-file-id]");
+  fileRows.forEach((row) => {
+    const fileID = row.getAttribute("data-file-id");
+    fetchAccesses(fileID);
+  });
+}
+
+// Initialize periodic refresh for links table
+document.addEventListener("DOMContentLoaded", function () {
+  setInterval(refreshLinksTable, 60000); // Refresh every 1 minute
+});
+
+async function viewAccessDetails(accessID) {
+  if (!accessID) {
+    alert("Access ID is missing. Please try again.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Error: ${response.status} - ${error.message || "Failed to fetch access details"}`);
+    }
+
+    const accessDetails = await response.json();
+    console.log("Access Details:", accessDetails);
+
+    // Display access details (you can customize this as needed)
+    alert(`Access Details:\nName: ${accessDetails.Name}\nSubnets: ${accessDetails.Subnets.join(", ")}\nIPs: ${accessDetails.IPs.join(", ")}\nExpires: ${accessDetails.Expires || "No expiration"}\nPublic: ${accessDetails.Public ? "Yes" : "No"}\nOne-Time Use: ${accessDetails.OneTimeUse ? "Yes" : "No"}\nTTL: ${accessDetails.TTL || "Not set"}\nEnable TTL: ${accessDetails.EnableTTL ? "Yes" : "No"}`);
+  } catch (error) {
+    console.error("Failed to fetch access details:", error);
+    alert(`Failed to fetch access details: ${error.message}`);
+  }
+}
+
+
+
 
 

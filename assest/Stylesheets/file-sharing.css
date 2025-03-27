@@ -59,7 +59,7 @@ body {
 /* ============================= */
 .sidebar {
   position: fixed;
-  top: 60px; /* matches navbar height (about 60px) */
+  top: 60px;
   left: 0;
   width: 250px;
   height: calc(100vh - 60px);
@@ -90,31 +90,12 @@ body {
   background-color: #08189c;
 }
 
-.file-info {
-  background-color: #2c2e3a;
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.file-info h3 {
-  margin-bottom: 5px;
-  font-size: 16px;
-  color: #ffcc00;
-}
-
-.file-info p {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #cccccc;
-}
-
 /* ============================= */
 /*         MAIN CONTENT          */
 /* ============================= */
 .main-content {
-  margin-left: 270px; /* 250px sidebar + 20px spacing */
-  padding: 80px 20px 20px; /* top padding to clear navbar, side & bottom padding */
+  margin-left: 270px;
+  padding: 80px 20px 20px;
   min-height: 100vh;
 }
 
@@ -143,12 +124,7 @@ body {
 /* ============================= */
 /*         FILES TABLE           */
 /* ============================= */
-.file-table h1 {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.file-table table {
+.file-table {
   width: 100%;
   border-collapse: collapse;
   background-color: #1e1f28;
@@ -156,134 +132,348 @@ body {
   overflow: hidden;
 }
 
-.file-table th,
+.file-table th, 
 .file-table td {
-  padding: 12px;
-  text-align: left;
+  padding: 12px 17px;
+  text-align: center;
+  vertical-align: middle;
   border-bottom: 1px solid #333;
 }
 
 .file-table th {
   background-color: #2c2e3a;
   color: #ffcc00;
+  font-weight: bold;
+  justify-content: center;
+  text-align: center;
 }
 
 .file-table tr:hover {
   background-color: #25262f;
 }
 
-/* Link Toggle Button */
-.links-toggle-btn {
-  background-color: #ffcc00;
-  border: none;
-  padding: 8px 12px;
-  color: #000;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 5px;
-}
-
-.links-toggle-btn:hover {
-  background-color: #e6b800;
-}
-
-/* Row that displays links below the file row */
-.links-row {
-  background-color: #2c2e3a;
-}
-
-/* Inner table for links */
-.inner-links-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.inner-links-table th,
-.inner-links-table td {
-  padding: 8px;
-  border-bottom: 1px solid #444;
-  font-size: 14px;
-  color: #fff;
-}
-
-/* Create Link Button (on the link row) */
-.create-link-btn {
+/* ============================= */
+/*     BUTTONS (GENERAL)         */
+/* ============================= */
+.update-access-btn,
+.view-details-btn,
+.copy-btn,
+.delete-link-btn {
   background-color: #0A21C0;
   border: none;
   padding: 8px 12px;
   color: #fff;
   font-weight: bold;
   border-radius: 5px;
-  margin-top: 10px;
   cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.update-access-btn:hover,
+.view-details-btn:hover,
+.copy-btn:hover,
+.delete-link-btn:hover {
+  background-color: #08189c;
+  transform: scale(1.05);
+}
+
+.update-access-btn:active,
+.view-details-btn:active,
+.copy-btn:active,
+.delete-link-btn:active {
+  background-color: #061275;
+  transform: scale(0.95);
+}
+
+/* Delete button specific styling */
+.delete-link-btn {
+  background-color: #e74c3c;
+}
+
+.delete-link-btn:hover {
+  background-color: #c0392b;
+}
+
+/* ============================= */
+/*        LINKS TABLE            */
+/* ============================= */
+.links-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  background-color: #2c2e3a;
+  border-radius: 5px;
+}
+
+.links-table th,
+.links-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #444;
+}
+
+.links-table th {
+  background-color: #3a3b47;
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+/* ============================= */
+/*        NON-EDITABLE LINK      */
+/* ============================= */
+.link-input {
+  width: 90%;
+  padding: 8px;
+  border-radius: 4px;
+  border: none;
+  background-color: #1e1f28;
+  color: #ffcc00;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+}
+
+.link-input:hover {
+  text-decoration: underline;
+}
+
+.link-input:focus {
+  outline: none;
+}
+
+/* ============================= */
+/*     ACTION BUTTONS FIX        */
+/* ============================= */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  padding-right: 1px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fix button size & style */
+.links-toggle-btn,
+.delete-btn {
+  padding: 6px 6px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.links-toggle-btn {
+  background-color: #ffcc00;
+  color: #000;
+}
+
+.links-toggle-btn:hover {
+  background-color: #e6b800;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+/* ============================= */
+/*      TOGGLE SWITCH FIX        */
+/* ============================= */
+.access-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 22px;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #777;
+  transition: 0.3s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #28a745;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* ============================= */
+/*        NEW TOGGLE ACCESS      */
+/* ============================= */
+.toggle-access {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================= */
+/*       CREATE LINK BUTTON      */
+/* ============================= */
+.link-table-header {
+  display: flex;
+  justify-content: flex-end; /* Aligns button to the right */
+  margin-bottom: 10px;
+}
+
+.create-link-btn {
+  background-color: #28a745;
+  border: none;
+  padding: 10px 15px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .create-link-btn:hover {
-  background-color: #08189c;
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.create-link-btn:active {
+  background-color: #1e7e34;
+  transform: scale(0.95);
+}
+
+/* Center the Add File modal without shadow */
+#uploadModal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 450px;
+  max-height: 450px;
+  background-color: #1e1f28; /* Remove shadow effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px; /* Optional: Add rounded corners */
+}
+
+
+/* Center content inside the Add File modal */
+#uploadModal .modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 8px;
+  width: 95%;
+  max-width: 450px;
+  background-color: #1e1f28;
+  box-shadow: none; /* Remove shadow */
+  height: 100%;
 }
 
 /* ============================= */
-/*       MODAL (UPLOAD)          */
+/*         MODAL STYLING         */
 /* ============================= */
 .modal {
   display: none; /* Hidden by default */
-  position: fixed;
-  z-index: 2000;
+  position: fixed; /* Stay in place */
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto; /* Enable scrolling if needed */
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-content {
   background-color: #1e1f28;
-  margin: 100px auto;
   padding: 20px;
   border-radius: 8px;
   width: 90%;
-  max-width: 500px;
+  text-align: center;
   position: relative;
+  box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
 }
 
+/* Close Button */
 .close-btn {
   position: absolute;
   top: 10px;
   right: 15px;
-  font-size: 24px;
+  font-size: 22px;
   cursor: pointer;
   color: #fff;
 }
 
-.modal-content h2 {
-  margin-bottom: 20px;
-  color: #ffcc00;
-}
-
+/* ============================= */
+/*      FILE INPUT STYLING       */
+/* ============================= */
 .form-row {
-  margin-bottom: 15px;
   display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.form-row label {
-  flex: 0 0 120px;
+/* Custom File Input */
+.file-label {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
   font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.form-row input[type='file'] {
-  flex: 1;
-  border: none;
+.file-label:hover {
+  background-color: #0056b3;
+}
+
+/* Selected File Name */
+#fileName {
   color: #ccc;
+  font-size: 14px;
 }
 
-.form-row input[type='checkbox'] {
-  margin-left: 10px;
-  transform: scale(1.2);
-}
-
+/* ============================= */
+/*         UPLOAD BUTTON         */
+/* ============================= */
 .upload-btn {
   background-color: #28a745;
   border: none;
@@ -299,6 +489,304 @@ body {
 }
 
 /* ============================= */
+/*          MODAL POPUP          */
+/* ============================= */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #1e1f28;
+  padding: 25px;
+  border-radius: 10px;
+  width: 400px;
+  color: white;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 22px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #ffcc00;
+}
+
+/* ============================= */
+/*          FORM STYLING         */
+/* ============================= */
+.input-field {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #2c2e3a;
+  color: white;
+  font-size: 14px;
+  transition: border 0.2s;
+}
+
+.input-field:focus {
+  border-color: #ffcc00;
+  outline: none;
+}
+
+/* Expiry field */
+.expiry-field {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Align labels and buttons */
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: start;
+}
+
+/* Round Add Button */
+.round-btn {
+  background: #28a745;
+  color: white;
+  font-size: 16px;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.round-btn:hover {
+  background: #218838;
+  transform: scale(1.1);
+}
+
+/* Added inputs for subnets & IPs */
+.dynamic-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.remove-btn {
+  background: #e74c3c;
+  color: white;
+  font-size: 14px;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.remove-btn:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.submit-btn:hover {
+  background: #0056b3;
+  transform: scale(1.02);
+}
+
+/* ============================= */
+/*          TOGGLE SWITCH        */
+/* ============================= */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #777;
+  transition: 0.3s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #28a745;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+.toggle-field{
+  padding: 5px;
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Fix Create Access modal box styling */
+#createAccessModal .modal-content {
+  background-color: #1e1f28;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px; /* Adjust width for better alignment */
+  text-align: left; /* Align text to the left for better readability */
+  position: relative;
+  box-shadow: none; /* Remove shadow if not needed */
+}
+
+#createAccessModal h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center; /* Center the heading */
+}
+
+#createAccessModal .input-field {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #2c2e3a;
+  color: white;
+  font-size: 14px;
+  transition: border 0.2s;
+}
+
+#createAccessModal .input-field:focus {
+  border-color: #ffcc00;
+  outline: none;
+}
+
+#createAccessModal .flex-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: space-between; /* Ensure proper spacing */
+}
+
+#createAccessModal .dynamic-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+#createAccessModal .remove-btn {
+  background: #e74c3c;
+  color: white;
+  font-size: 14px;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+}
+
+#createAccessModal .remove-btn:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+#createAccessModal .submit-btn {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background 0.2s, transform 0.1s;
+}
+
+#createAccessModal .submit-btn:hover {
+  background: #0056b3;
+  transform: scale(1.02);
+}
+
+/* ============================= */
 /*      RESPONSIVE ADJUSTS       */
 /* ============================= */
 @media (max-width: 768px) {
@@ -308,7 +796,6 @@ body {
 
   .main-content {
     margin-left: 220px;
-    padding: 80px 20px 20px;
   }
 }
 
@@ -319,9 +806,10 @@ body {
 
   .main-content {
     margin-left: 0;
-    padding: 80px 20px 20px;
   }
 }
+
+
 
 
 

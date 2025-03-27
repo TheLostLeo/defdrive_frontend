@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DefDrive - File Manager</title>
-  <link rel="stylesheet" href="../assest/Stylesheets/file-sharing.css" />
+  <link rel="stylesheet" href="../assest/Stylesheets/file-sharing.css">
   <link rel="icon" type="image/png" href="../assest/Image/logo.png">
 </head>
 <body>
+
   <!-- Navigation Bar -->
   <nav class="navbar">
     <div class="nav-left">
@@ -18,82 +20,116 @@
   </nav>
 
   <!-- Sidebar -->
-  <div class="sidebar">
+  <aside class="sidebar">
     <button class="add-file-btn" onclick="openUploadModal()">+ Add File</button>
-    <div class="file-info">
-      <h3>Total Files</h3>
-      <p>2750 Files</p>
-      <p>75.5GB / <b>100GB</b></p>
-    </div>
-  </div>
+  </aside>
 
   <!-- Main Content -->
-  <div class="main-content">
+  <main class="main-content">
+
     <!-- Search Bar -->
     <div class="search-container">
-      <input type="text" id="searchBar" placeholder="Search indexed files..." />
+      <input type="text" id="searchBar" placeholder="Search indexed files...">
     </div>
 
     <!-- File List Table -->
-    <div class="file-table">
-      <h1>My Files</h1>
-      <table id="filesTable">
+    <section class="file-table">
+      <table class="file-table">
         <thead>
           <tr>
             <th>File Name</th>
             <th>Size</th>
-            <th>Links</th>
+            <th>Actions</th>
+            <th>Access</th>
           </tr>
         </thead>
-        <tbody id="filesTbody">
-          <!-- Dynamically populated by JavaScript -->
+        <tbody>
+          <!-- Rows will be dynamically populated by JavaScript -->
         </tbody>
       </table>
+    </section>
+
+    <!-- Modal for Uploading a File -->
+    <div class="modal" id="uploadModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeUploadModal()">&times;</span>
+        <h2>Upload a File</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div class="form-row">
+            <label for="fileInput" class="file-label">Select a File</label>
+            <input type="file" id="fileInput" name="file" required hidden>
+            <span id="fileName">No file chosen</span>
+          </div>
+          <p id="uploadMessage"></p>
+          <button type="submit" class="upload-btn">Upload File</button>
+        </form>
+      </div>
     </div>
 
-  <!-- Modal for Uploading a File -->
-  <div class="modal" id="uploadModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeUploadModal()">&times;</span>
-      <h2>Upload a File</h2>
-      <form id="uploadForm" enctype="multipart/form-data">
-        <div class="form-row">
-          <label for="fileInput">Choose File:</label>
-          <input type="file" id="fileInput" name="file" required />
+    <div id="createAccessModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeCreateAccessModal()">&times;</span>
+        <h2 id="accessModalHeader">Create Access</h2> <!-- Dynamically updated header -->
+
+        <!-- Name field (only for Create Access) -->
+        <div id="accessNameContainer">
+          <label>Name:</label>
+          <input type="text" id="accessNameInput" class="input-field" placeholder="Enter access name">
         </div>
-        <div class="form-row">
-          <label for="publicCheckbox">Public File:</label>
-          <input type="checkbox" id="publicCheckbox" name="public" />
+
+        <div class="flex-row">
+          <label>Subnets:</label>
+          <button id="addSubnetBtn" class="round-btn">+</button>
         </div>
-        <button type="submit" class="upload-btn">Upload File</button>
-      </form>
+        <div id="subnetContainer"></div>
+
+        <div class="flex-row">
+          <label>IPs:</label>
+          <button id="addIpBtn" class="round-btn">+</button>
+        </div>
+        <div id="ipContainer"></div>
+
+        <div class="expiry-field">
+          <label>Expires in:</label>
+          <input type="number" id="accessExpires" class="input-field" placeholder="Days">
+        </div>
+
+        <div class="toggle-field">
+          <span>Public:</span>
+          <label class="switch">
+            <input type="checkbox" id="accessPublic">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-field">
+          <span>One-Time Use:</span>
+          <label class="switch">
+            <input type="checkbox" id="accessOneTimeUse">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <label>TTL:</label>
+        <input type="number" id="accessTTL" class="input-field" placeholder="TTL (in minutes)">
+
+        <div class="toggle-field">
+          <span>Enable TTL:</span>
+          <label class="switch">
+            <input type="checkbox" id="accessEnableTTL">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="button-container">
+          <button class="submit-btn" id="createAccessBtn" onclick="handleCreateAccess()">Create</button>
+          <button class="submit-btn hidden" id="updateAccessBtn" onclick="handleUpdateAccess()">Update</button>
+          <button class="submit-btn hidden update-access-btn" id="viewAccessDetailsBtn" onclick="viewAccessDetails()">View Details</button>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <script src="../assest/Scripts/file-sharing.js"></script>
-<script src="../assest/Scripts/file.js"></script> 
-  <script>
-    // Toggle the row containing links
-    function toggleLinks(rowId) {
-      const row = document.getElementById(rowId);
-      row.classList.toggle('hidden');
-    }
-
-    // Open upload modal
-    function openUploadModal() {
-      document.getElementById('uploadModal').style.display = 'block';
-    }
-
-    // Close upload modal
-    function closeUploadModal() {
-      document.getElementById('uploadModal').style.display = 'none';
-    }
-  </script>
+  </main>
+  <script src="../assest/Scripts/file-sharing.js" defer></script>
 </body>
 </html>
-
-
-
-
-
-

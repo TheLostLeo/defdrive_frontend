@@ -1,3 +1,4 @@
+const API_BASE_URL = "https://defdb.wlan0.in/api/";
 document.addEventListener("DOMContentLoaded", () => {
     // Get references to key elements
     const mainBody = document.querySelector(".Main_body");
@@ -52,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   
       try {
-        const response = await fetch("https://defdrive.wlan0.in/api/login", {
+        const response = await fetch(`${API_BASE_URL}login` ,{
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password })
@@ -65,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
           sessionStorage.setItem("username", result.user.username);
           sessionStorage.setItem("loggedin", "yes");
           // Redirect to index page
-          window.location.href = "../index.html";
+          window.location.href = "../pages/share.html";
         } else {
           // For errors, display the error message returned by the server
           showErrorMessage(loginForm, result.error || result.message);
@@ -123,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
       //   "password": "password123"
       // }
       try {
-        const response = await fetch("https://defdrive.wlan0.in/api/signup", {
+        const response = await fetch(`${API_BASE_URL}signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, email, username, password })
