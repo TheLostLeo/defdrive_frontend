@@ -256,7 +256,7 @@ async function deleteFile(fileID) {
     console.log("File deleted successfully:", result);
     alert("File deleted successfully!");
     logFileAction("Delete File", fileID);
-    fetchFiles(); // Refresh the file list
+    fetchFiles(); // Refresh the file list after deletion
   } catch (error) {
     console.error("Failed to delete file:", error);
     alert("Failed to delete file. Please try again.");
@@ -366,6 +366,7 @@ async function deleteAccess(accessID) {
     const result = await response.json();
     console.log("Access deleted successfully:", result);
     alert("Access deleted successfully!");
+    fetchFiles(); // Refresh the file list after access deletion
   } catch (error) {
     console.error("Failed to delete access:", error);
     alert("Failed to delete access. Please try again.");
@@ -468,7 +469,12 @@ function populateAccessTable(fileID, accesses) {
 // Handle create access
 function handleCreateAccess() {
   const fileID = document.querySelector("#createAccessModal").getAttribute("data-file-id");
-  const name = document.getElementById("accessName").value;
+  if (!fileID) {
+    alert("File ID is missing. Please try again.");
+    return;
+  }
+
+  const name = document.getElementById("accessNameInput").value;
   const subnets = Array.from(document.querySelectorAll("#subnetContainer .input-field")).map(input => input.value);
   const ips = Array.from(document.querySelectorAll("#ipContainer .input-field")).map(input => input.value);
   const expires = document.getElementById("accessExpires").value;
@@ -562,20 +568,25 @@ async function openUpdateAccessModal(accessID) {
 // Handle updating an access
 async function handleUpdateAccess() {
   const accessID = document.querySelector("#createAccessModal").getAttribute("data-access-id");
-  const name = document.getElementById("accessName").value;
-  const subnets = Array.from(document.querySelectorAll("#subnetContainer .input-field")).map(input => input.value);
-  const ips = Array.from(document.querySelectorAll("#ipContainer .input-field")).map(input => input.value);
-  const expires = document.getElementById("accessExpires").value;
+  if (!accessID) {
+    alert("Access ID is missing. Please try again.");
+    return;
+  }
+
+  const name = document.getElementById("accessNameInput").value.trim(); // Get the name field
+  const subnets = Array.from(document.querySelectorAll("#subnetContainer .input-field")).map(input => input.value.trim());
+  const ips = Array.from(document.querySelectorAll("#ipContainer .input-field")).map(input => input.value.trim());
+  const expires = document.getElementById("accessExpires").value.trim();
   const isPublic = document.getElementById("accessPublic").checked;
   const oneTimeUse = document.getElementById("accessOneTimeUse").checked;
-  const ttl = document.getElementById("accessTTL").value;
+  const ttl = document.getElementById("accessTTL").value.trim();
   const enableTTL = document.getElementById("accessEnableTTL").checked;
 
   const accessData = {
-    name,
-    subnets,
-    ips,
-    expires: expires ? new Date(Date.now() + expires * 24 * 60 * 60 * 1000).toISOString() : null,
+    name, // Include the name field
+    subnets: subnets.filter(Boolean), // Remove empty values
+    ips: ips.filter(Boolean), // Remove empty values
+    expires: expires || null, // Use the provided expiration date or null
     public: isPublic,
     oneTimeUse,
     ttl: ttl ? parseInt(ttl, 10) : null,
@@ -583,16 +594,22 @@ async function handleUpdateAccess() {
   };
 
   try {
-    const response = await fetch(`${API_BASE_URL}accesses/${accessID}/access`, {
+    const requestBody = JSON.stringify(accessData); // Ensure proper JSON formatting// Debugging log to verify the JSON structure
+
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getAuthToken()}`,
       },
-      body: JSON.stringify(accessData),
+      body: requestBody,
     });
 
-    if (!response.ok) throw new Error(`Error: ${response.status}`);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Error: ${response.status} - ${error.message || "Failed to update access"}`);
+    }
+
     const result = await response.json();
     console.log("Access updated successfully:", result);
     alert("Access updated successfully!");
@@ -600,7 +617,7 @@ async function handleUpdateAccess() {
     fetchAccesses(result.FileID); // Refresh the access list for the file
   } catch (error) {
     console.error("Failed to update access:", error);
-    alert("Failed to update access. Please try again.");
+    alert(`Failed to update access: ${error.message}`);
   }
 }
 
