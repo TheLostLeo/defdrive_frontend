@@ -132,17 +132,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const logoutBtn = document.querySelector(".logout-btn");
 
   if (logoutBtn) {
-    console.log("Logout button found and event listener added!");
-
     logoutBtn.addEventListener("click", function () {
-      console.log("Logout button clicked!"); // Debugging
-
       // Remove token and username from session storage
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("username");
 
-      // Redirect to GitHub Pages index
-      window.location.href = window.location.origin + "/your-repo-name/";
+      // Reload the current page
+      location.reload();
     });
   } else {
     console.error("Logout button not found!");
