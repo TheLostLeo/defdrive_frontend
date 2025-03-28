@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("username");
 
-      // Redirect to the index page correctly in GitHub Pages
+      // Redirect to GitHub Pages index
       window.location.href = window.location.origin + "/your-repo-name/";
     });
   } else {
