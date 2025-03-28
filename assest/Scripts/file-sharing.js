@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!authToken) {
     showNotification("You are not logged in. Please log in to continue.", false);
     // Redirect to login page or handle unauthorized access
-    window.location.href = "/login.html"; // Adjust the path to your login page
+    window.location.href = "./login.html"; // Adjust the path to your login page
   }
 });
 
@@ -134,7 +134,7 @@ document.querySelector(".logout-btn").addEventListener("click", function () {
   sessionStorage.removeItem("username");
 
   // Redirect to the index page
-  window.location.href = "../index.html";
+  window.location.href = "./../index.html";
 });
 
 // =============================
