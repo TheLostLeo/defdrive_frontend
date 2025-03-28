@@ -121,7 +121,7 @@ function getAuthToken() {
 document.addEventListener("DOMContentLoaded", function () {
   const authToken = sessionStorage.getItem("token");
   if (!authToken) {
-    alert("You are not logged in. Please log in to continue.");
+    showNotification("You are not logged in. Please log in to continue.", false);
     // Redirect to login page or handle unauthorized access
     window.location.href = "/login.html"; // Adjust the path to your login page
   }
@@ -208,7 +208,7 @@ async function uploadFile(file) {
 
     const token = getAuthToken();
     if (!token) {
-      alert("Authorization token is missing. Please log in.");
+      showNotification("Authorization token is missing. Please log in.", false);
       return;
     }
 
@@ -227,7 +227,7 @@ async function uploadFile(file) {
 
     const result = await response.json();
     console.log("File uploaded successfully:", result);
-    alert("File uploaded successfully!");
+    showNotification("File uploaded successfully!", true);
     // Reset the file input and update the UI after successful upload
     fileInput.value = "";
     const fileNameDisplay = document.getElementById("fileName");
@@ -238,7 +238,7 @@ async function uploadFile(file) {
     fetchFiles(); // Refresh the file list
   } catch (error) {
     console.error("Failed to upload file:", error);
-    alert(`Failed to upload file: ${error.message}`);
+    showNotification(`Failed to upload file: ${error.message}`, false);
   }
 }
 
@@ -254,12 +254,12 @@ async function deleteFile(fileID) {
     if (!response.ok) throw new Error(`Error: ${response.status}`);
     const result = await response.json();
     console.log("File deleted successfully:", result);
-    alert("File deleted successfully!");
+    showNotification("File deleted successfully!", true);
     logFileAction("Delete File", fileID);
     fetchFiles(); // Refresh the file list after deletion
   } catch (error) {
     console.error("Failed to delete file:", error);
-    alert("Failed to delete file. Please try again.");
+    showNotification("Failed to delete file. Please try again.", false);
   }
 }
 
@@ -277,10 +277,10 @@ async function toggleFilePublic(fileID, isPublic) {
     if (!response.ok) throw new Error(`Error: ${response.status}`);
     const result = await response.json();
     console.log("File access updated successfully:", result);
-    alert("File access updated successfully!");
+    showNotification("File access updated successfully!", true);
   } catch (error) {
     console.error("Failed to update file access:", error);
-    alert("Failed to update file access. Please try again.");
+    showNotification("Failed to update file access. Please try again.", false);
   }
 }
 
@@ -324,18 +324,18 @@ async function createAccess(fileID, accessData) {
     if (!response.ok) throw new Error(`Error: ${response.status}`);
     const result = await response.json();
     console.log("Access created successfully:", result);
-    alert("Access created successfully!");
+    showNotification("Access created successfully!", true);
     fetchAccesses(fileID); // Refresh the access list
   } catch (error) {
     console.error("Failed to create access:", error);
-    alert("Failed to create access. Please try again.");
+    showNotification("Failed to create access. Please try again.", false);
   }
 }
 
 // Update an access
 async function updateAccess(accessID, accessData) {
   try {
-    const response = await fetch(`${API_BASE_URL}accesses/${accessID}/access`, {
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -346,10 +346,10 @@ async function updateAccess(accessID, accessData) {
     if (!response.ok) throw new Error(`Error: ${response.status}`);
     const result = await response.json();
     console.log("Access updated successfully:", result);
-    alert("Access updated successfully!");
+    showNotification("Access updated successfully!", true);
   } catch (error) {
     console.error("Failed to update access:", error);
-    alert("Failed to update access. Please try again.");
+    showNotification("Failed to update access. Please try again.", false);
   }
 }
 
@@ -365,11 +365,11 @@ async function deleteAccess(accessID) {
     if (!response.ok) throw new Error(`Error: ${response.status}`);
     const result = await response.json();
     console.log("Access deleted successfully:", result);
-    alert("Access deleted successfully!");
+    showNotification("Access deleted successfully!", true);
     fetchFiles(); // Refresh the file list after access deletion
   } catch (error) {
     console.error("Failed to delete access:", error);
-    alert("Failed to delete access. Please try again.");
+    showNotification("Failed to delete access. Please try again.", false);
   }
 }
 
@@ -470,7 +470,7 @@ function populateAccessTable(fileID, accesses) {
 function handleCreateAccess() {
   const fileID = document.querySelector("#createAccessModal").getAttribute("data-file-id");
   if (!fileID) {
-    alert("File ID is missing. Please try again.");
+    showNotification("File ID is missing. Please try again.", false);
     return;
   }
 
@@ -561,7 +561,7 @@ async function openUpdateAccessModal(accessID) {
     modal.style.display = "flex";
   } catch (error) {
     console.error("Failed to fetch access details:", error);
-    alert(`Failed to fetch access details: ${error.message}`);
+    showNotification(`Failed to fetch access details: ${error.message}`, false);
   }
 }
 
@@ -569,24 +569,24 @@ async function openUpdateAccessModal(accessID) {
 async function handleUpdateAccess() {
   const accessID = document.querySelector("#createAccessModal").getAttribute("data-access-id");
   if (!accessID) {
-    alert("Access ID is missing. Please try again.");
+    showNotification("Access ID is missing. Please try again.", false);
     return;
   }
 
-  const name = document.getElementById("accessNameInput").value.trim(); // Get the name field
+  const name = document.getElementById("accessNameInput").value.trim() || "Unnamed Access";
   const subnets = Array.from(document.querySelectorAll("#subnetContainer .input-field")).map(input => input.value.trim());
   const ips = Array.from(document.querySelectorAll("#ipContainer .input-field")).map(input => input.value.trim());
-  const expires = document.getElementById("accessExpires").value.trim();
+  const expires = document.getElementById("accessExpires").value.trim() || "1";
   const isPublic = document.getElementById("accessPublic").checked;
   const oneTimeUse = document.getElementById("accessOneTimeUse").checked;
-  const ttl = document.getElementById("accessTTL").value.trim();
+  const ttl = document.getElementById("accessTTL").value.trim() || null;
   const enableTTL = document.getElementById("accessEnableTTL").checked;
 
   const accessData = {
-    name, // Include the name field
-    subnets: subnets.filter(Boolean), // Remove empty values
-    ips: ips.filter(Boolean), // Remove empty values
-    expires: expires || null, // Use the provided expiration date or null
+    name,
+    subnets: subnets.filter(Boolean),
+    ips: ips.filter(Boolean),
+    expires: new Date(Date.now() + parseInt(expires, 10) * 24 * 60 * 60 * 1000).toISOString(),
     public: isPublic,
     oneTimeUse,
     ttl: ttl ? parseInt(ttl, 10) : null,
@@ -594,9 +594,10 @@ async function handleUpdateAccess() {
   };
 
   try {
-    const requestBody = JSON.stringify(accessData); // Ensure proper JSON formatting// Debugging log to verify the JSON structure
+    const requestBody = JSON.stringify(accessData);
+    console.log("Request Body:", requestBody);
 
-    const response = await fetch(`${API_BASE_URL}accesses/${accessID}`, {
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}/access`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -612,12 +613,12 @@ async function handleUpdateAccess() {
 
     const result = await response.json();
     console.log("Access updated successfully:", result);
-    alert("Access updated successfully!");
+    showNotification("Access updated successfully!", true);
     closeCreateAccessModal();
-    fetchAccesses(result.FileID); // Refresh the access list for the file
+    fetchAccesses(result.FileID);
   } catch (error) {
     console.error("Failed to update access:", error);
-    alert(`Failed to update access: ${error.message}`);
+    showNotification(`Failed to update access: ${error.message}`, false);
   }
 }
 
@@ -639,7 +640,7 @@ async function uploadFile() {
 
   const file = fileInput.files[0];
   if (!file) {
-    alert("Please select a file to upload.");
+    showNotification("Please select a file to upload.", false);
     return;
   }
 
@@ -649,7 +650,7 @@ async function uploadFile() {
 
     const token = getAuthToken();
     if (!token) {
-      alert("Authorization token is missing. Please log in.");
+      showNotification("Authorization token is missing. Please log in.", false);
       return;
     }
 
@@ -668,7 +669,7 @@ async function uploadFile() {
 
     const result = await response.json();
     console.log("File uploaded successfully:", result);
-    alert("File uploaded successfully!");
+    showNotification("File uploaded successfully!", true);
     // Reset the file input and update the UI after successful upload
     fileInput.value = "";
     const fileNameDisplay = document.getElementById("fileName");
@@ -679,7 +680,7 @@ async function uploadFile() {
     fetchFiles(); // Refresh the file list
   } catch (error) {
     console.error("Failed to upload file:", error);
-    alert(`Failed to upload file: ${error.message}`);
+    showNotification(`Failed to upload file: ${error.message}`, false);
   }
 }
 
@@ -769,7 +770,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function viewAccessDetails(accessID) {
   if (!accessID) {
-    alert("Access ID is missing. Please try again.");
+    showNotification("Access ID is missing. Please try again.", false);
     return;
   }
 
@@ -791,11 +792,34 @@ async function viewAccessDetails(accessID) {
     console.log("Access Details:", accessDetails);
 
     // Display access details (you can customize this as needed)
-    alert(`Access Details:\nName: ${accessDetails.Name}\nSubnets: ${accessDetails.Subnets.join(", ")}\nIPs: ${accessDetails.IPs.join(", ")}\nExpires: ${accessDetails.Expires || "No expiration"}\nPublic: ${accessDetails.Public ? "Yes" : "No"}\nOne-Time Use: ${accessDetails.OneTimeUse ? "Yes" : "No"}\nTTL: ${accessDetails.TTL || "Not set"}\nEnable TTL: ${accessDetails.EnableTTL ? "Yes" : "No"}`);
+    showNotification(`Access Details:\nName: ${accessDetails.Name}\nSubnets: ${accessDetails.Subnets.join(", ")}\nIPs: ${accessDetails.IPs.join(", ")}\nExpires: ${accessDetails.Expires || "No expiration"}\nPublic: ${accessDetails.Public ? "Yes" : "No"}\nOne-Time Use: ${accessDetails.OneTimeUse ? "Yes" : "No"}\nTTL: ${accessDetails.TTL || "Not set"}\nEnable TTL: ${accessDetails.EnableTTL ? "Yes" : "No"}`, true);
   } catch (error) {
     console.error("Failed to fetch access details:", error);
-    alert(`Failed to fetch access details: ${error.message}`);
+    showNotification(`Failed to fetch access details: ${error.message}`, false);
   }
+}
+
+// Function to display a popup notification
+function showNotification(message, isSuccess = true) {
+  // Remove any existing notification
+  const existingNotification = document.querySelector(".notification");
+  if (existingNotification) {
+    existingNotification.remove();
+  }
+
+  // Create a new notification
+  const notification = document.createElement("div");
+  notification.className = `notification ${isSuccess ? "success" : "error"}`;
+  notification.textContent = message;
+
+  document.body.appendChild(notification);
+
+  // Automatically remove the notification after 10 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 10000);
 }
 
 

@@ -809,6 +809,47 @@ input:checked + .slider:before {
   }
 }
 
+/* ============================= */
+/*      NOTIFICATION POPUP       */
+/* ============================= */
+/* Notification Popup */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  z-index: 10000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  animation: fadeInOut 10s ease-in-out;
+}
+
+.notification.success {
+  background-color: #28a745; /* Green for success */
+}
+
+.notification.error {
+  background-color: #e74c3c; /* Red for error */
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  10%, 90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
 
 
 
