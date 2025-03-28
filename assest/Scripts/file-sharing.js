@@ -127,6 +127,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// Logout functionality
+document.querySelector(".logout-btn").addEventListener("click", function () {
+  // Remove token and username from session storage
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("username");
+
+  // Redirect to the index page
+  window.location.href = "/index.html";
+});
+
 // =============================
 // File Endpoints
 // =============================
