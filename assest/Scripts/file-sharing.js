@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!authToken) {
     showNotification("You are not logged in. Please log in to continue.", false);
     // Redirect to login page or handle unauthorized access
-    window.location.href = "./login.html"; // Adjust the path to your login page
+    window.location.href = "/"; // Adjust the path to your login page
   }
 });
 
@@ -388,6 +388,53 @@ async function deleteAccess(accessID) {
   } catch (error) {
     console.error("Failed to delete access:", error);
     showNotification("Failed to delete access. Please try again.", false);
+  }
+}
+
+// Toggle access public/private in the links table
+async function toggleAccessPublic(accessID, isPublic) {
+  try {
+    // Fetch the current access JSON
+    const response = await fetch(`${API_BASE_URL}accesses/${accessID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Error: ${response.status} - ${error.message || "Failed to fetch access details"}`);
+    }
+
+    const accessData = await response.json();
+    console.log("Fetched Access Data:", accessData);
+
+    // Update the public field
+    accessData.Public = isPublic;
+
+    // Send the updated JSON back to the server
+    const updateResponse = await fetch(`${API_BASE_URL}accesses/${accessID}/access`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+      body: JSON.stringify(accessData),
+    });
+
+    if (!updateResponse.ok) {
+      const updateError = await updateResponse.json();
+      throw new Error(`Error: ${updateResponse.status} - ${updateError.message || "Failed to update access"}`);
+    }
+
+    const updatedAccess = await updateResponse.json();
+    console.log("Access updated successfully:", updatedAccess);
+    showNotification("Access updated successfully!", true);
+  } catch (error) {
+    console.error("Failed to toggle access public/private:", error);
+    showNotification(`Failed to toggle access: ${error.message}`, false);
   }
 }
 
