@@ -40,42 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   
-    // ----- Login Form Submission -----
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-  
-      const username = loginForm.querySelector("input[type='text']").value.trim();
-      const password = loginForm.querySelector("input[type='password']").value.trim();
-  
-      if (!username || !password) {
-        showErrorMessage(loginForm, "Username and password are required.");
-        return;
-      }
-  
-      try {
-        const response = await fetch(`${API_BASE_URL}login` ,{
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password })
-        });
-  
-        const result = await response.json();
-        if (response.ok) {
-          // Save token and username in sessionStorage
-          sessionStorage.setItem("token", result.token);
-          sessionStorage.setItem("username", result.user.username);
-          sessionStorage.setItem("loggedin", "yes");
-          // Redirect to index page
-          window.location.href = "../pages/share.html";
-        } else {
-          // For errors, display the error message returned by the server
-          showErrorMessage(loginForm, result.error || result.message);
-        }
-      } catch (error) {
-        showErrorMessage(loginForm, "Network error. Please try again.");
-      }
-    });
-  
     // ----- Signup Form Submission -----
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -104,9 +68,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
   
-      // Validate minimum password length
-      if (password.length < 8) {
-        showErrorMessage(signupForm, "Password must be at least 8 characters long.");
+      // Validate password constraints
+      const requirements = [
+        { regex: /.{8,}/, message: "At least 8+ characters" },
+        { regex: /[A-Z]/, message: ",1 Uppercase letter" },
+        { regex: /[0-9]/, message: ",1 number" },
+        { regex: /[!@#$%^&*(),.?":{}|<>]/, message: ", 1 special character" },
+      ];
+  
+      const unmetRequirements = requirements.filter((req) => !req.regex.test(password));
+      if (unmetRequirements.length > 0) {
+        const unmetMessages = unmetRequirements.map((req) => req.message).join(", ");
+        showErrorMessage(signupForm, `Password must have: ${unmetMessages}`);
         return;
       }
   
@@ -152,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
       errorMessage.className = "error-message";
       errorMessage.textContent = message;
       errorMessage.style.color = "red";
+      errorMessage.style.fontSize = "12px"; // Make the font size smaller
       form.appendChild(errorMessage);
     }
   
@@ -173,8 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
   });
-  
-  
+
+
 
 
 
