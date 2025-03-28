@@ -134,7 +134,7 @@ document.querySelector(".logout-btn").addEventListener("click", function () {
   sessionStorage.removeItem("username");
 
   // Redirect to the index page
-  window.location.href = "/";
+  window.location.href = window.location.origin + "/defdrive_frontend/";
 });
 
 // =============================
