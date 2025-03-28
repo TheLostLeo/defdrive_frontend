@@ -415,7 +415,7 @@ async function toggleAccessPublic(accessID, isPublic) {
     accessData.Public = isPublic;
 
     // Send the updated JSON back to the server
-    const updateResponse = await fetch(`${API_BASE_URL}accesses/${accessID}`, {
+    const updateResponse = await fetch(`${API_BASE_URL}accesses/${accessID}/access`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
