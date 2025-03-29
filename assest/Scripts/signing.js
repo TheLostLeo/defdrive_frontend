@@ -118,6 +118,41 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   
+    // ----- Login Form Submission -----
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+  
+      const username = loginForm.querySelector("#loginUsername").value.trim();
+      const password = loginForm.querySelector("#loginPassword").value.trim();
+  
+      if (!username || !password) {
+        showErrorMessage(loginForm, "Username and password are required.");
+        return;
+      }
+  
+      try {
+        const response = await fetch(`${API_BASE_URL}login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+  
+        const result = await response.json();
+        if (response.ok) {
+          // Save token and username in sessionStorage
+          sessionStorage.setItem("token", result.token);
+          sessionStorage.setItem("username", result.user.username);
+          sessionStorage.setItem("loggedin", "yes");
+          // Redirect to share page
+          window.location.href = "./share.html";
+        } else {
+          showErrorMessage(loginForm, result.error || result.message);
+        }
+      } catch (error) {
+        showErrorMessage(loginForm, "Network error. Please try again.");
+      }
+    });
+  
     // ----- Helper Functions -----
     function showErrorMessage(form, message) {
       removeExistingMessages(form);
