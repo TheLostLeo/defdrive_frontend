@@ -71,11 +71,8 @@
         <span class="close-btn" onclick="closeCreateAccessModal()">&times;</span>
         <h2 id="accessModalHeader">Create Access</h2> <!-- Dynamically updated header -->
 
-        <!-- Name field (only for Create Access) -->
-        <div id="accessNameContainer">
-          <label>Name:</label>
-          <input type="text" id="accessNameInput" class="input-field" placeholder="Enter access name">
-        </div>
+        <!-- Hidden field for Access Name -->
+        <input type="hidden" id="accessNameInput">
 
         <div class="flex-row">
           <label>Subnets:</label>

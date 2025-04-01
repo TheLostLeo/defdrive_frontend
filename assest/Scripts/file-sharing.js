@@ -17,12 +17,27 @@ function toggleLinks(button, fileID) {
 }
 
 // Copy the link to clipboard
-function copyToClipboard(button) {
-  const linkInput = button.closest("tr").querySelector(".link-input");
-  linkInput.select();
-  navigator.clipboard.writeText(linkInput.value);
-  button.textContent = "Copied!";
-  setTimeout(() => (button.textContent = "Copy"), 1500);
+function copyToClipboard(link) {
+  navigator.clipboard.writeText(link).then(() => {
+    showMessageModal("Link copied to clipboard!");
+  }).catch((error) => {
+    console.error("Failed to copy link:", error);
+    showMessageModal("Failed to copy link.");
+  });
+}
+
+function showMessageModal(message) {
+  const messageModal = document.getElementById("messageModal");
+  const messageText = document.getElementById("messageText");
+
+  if (messageModal && messageText) {
+    messageText.textContent = message;
+    messageModal.style.display = "flex";
+
+    setTimeout(() => {
+      messageModal.style.display = "none";
+    }, 2000); // Hide the modal after 2 seconds
+  }
 }
 
 // Open upload modal
@@ -510,11 +525,9 @@ function populateAccessTable(fileID, accesses) {
     const fullLink = `https://defdb.wlan0.in/link/${access.Link}`;
     const accessRow = document.createElement("tr");
     accessRow.innerHTML = `
+      <td>${access.Name || "Unnamed Access"}</td>
       <td>
-        <input type="text" class="link-input" value="${fullLink}" readonly onclick="openLink(this)">
-      </td>
-      <td>
-        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+        <button class="copy-btn" onclick="copyToClipboard('${fullLink}')">Copy</button>
       </td>
       <td>
         <button class="update-access-btn" onclick="openUpdateAccessModal(${access.ID})">Update Access</button>
@@ -539,7 +552,7 @@ function handleCreateAccess() {
     return;
   }
 
-  const name = document.getElementById("accessNameInput").value;
+  const name = document.getElementById("accessNameInput").value; // Fetch the hidden Access Name
   const subnets = Array.from(document.querySelectorAll("#subnetContainer .input-field")).map(input => input.value);
   const ips = Array.from(document.querySelectorAll("#ipContainer .input-field")).map(input => input.value);
   const expires = document.getElementById("accessExpires").value;
@@ -584,6 +597,9 @@ async function openUpdateAccessModal(accessID) {
     }
 
     const access = await response.json();
+
+    // Fetch and set the Access Name in the hidden field
+    document.getElementById("accessNameInput").value = access.Name || "";
 
     // Populate other fields
     const subnets = Array.isArray(access.Subnets) ? access.Subnets : [];
